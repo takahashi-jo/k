@@ -67,7 +67,15 @@ case $RESOURCE in
         fi
         INIT_CONTAINERS=$(kubectl get pod -n "$NAMESPACE" "$POD" -o=jsonpath='{.spec.initContainers[*].name}' | tr ' ' '\n')
         CONTAINERS=$(kubectl get pod -n "$NAMESPACE" "$POD" -o=jsonpath='{.spec.containers[*].name}' | tr ' ' '\n')
-        CONTAINER_LIST="$INIT_CONTAINERS"$'\n'"$CONTAINERS"
+        if [ -n "$INIT_CONTAINERS" ]; then
+            CONTAINER_LIST=$INIT_CONTAINERS
+        fi
+        if [ -n "$CONTAINERS" ]; then
+            if [ -n "$CONTAINER_LIST" ]; then
+                CONTAINER_LIST+=$'\n'
+            fi
+            CONTAINER_LIST+="$CONTAINERS"
+        fi
         CONTAINER=$(echo "$CONTAINER_LIST" | fzf $FZF_OPTS --prompt='CONTAINER > ')
           if [ -n "$CONTAINER" ]; then
           FILTER=$(echo | fzf $FZF_OPTS --prompt='Filter logs (optional): ' --print-query | head -n 1)
@@ -91,7 +99,15 @@ case $RESOURCE in
         fi
         INIT_CONTAINERS=$(kubectl get pod -n "$NAMESPACE" "$POD" -o=jsonpath='{.spec.initContainers[*].name}' | tr ' ' '\n')
         CONTAINERS=$(kubectl get pod -n "$NAMESPACE" "$POD" -o=jsonpath='{.spec.containers[*].name}' | tr ' ' '\n')
-        CONTAINER_LIST="$INIT_CONTAINERS"$'\n'"$CONTAINERS"
+        if [ -n "$INIT_CONTAINERS" ]; then
+            CONTAINER_LIST=$INIT_CONTAINERS
+        fi
+        if [ -n "$CONTAINERS" ]; then
+            if [ -n "$CONTAINER_LIST" ]; then
+                CONTAINER_LIST+=$'\n'
+            fi
+            CONTAINER_LIST+="$CONTAINERS"
+        fi
         CONTAINER=$(echo "$CONTAINER_LIST" | fzf $FZF_OPTS --prompt='CONTAINER > ')
         if [ -n "$CONTAINER" ]; then
           CMD_TO_EXEC=$(echo | fzf $FZF_OPTS --prompt='Enter command (e.g., /bin/bash): ' --print-query | head -n 1)
