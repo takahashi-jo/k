@@ -2,7 +2,7 @@
 
 FZF_OPTS="--height=25% --border --reverse"
 
-RESOURCE=$(echo -e "POD\nDEPLOYMENT\nREPLICASET\nSTATEFULSET\nDAEMONSET\nJOB\nCRONJOB\nHORIZONTALPODAUTOSCALING\nSERVICE\nINGRESS\nCONFIGMAP\nSECRET\nPERSISTENTVOLUMECLAIM\nPERSISTENTVOLUME\nSERVICEACCOUNT\nROLE\nROLEBINDING\nCLUSTERROLE\nCLUSTERROLEBINDING\nCUSTOMRESOURCEDEFINITION\nNODE" | fzf $FZF_OPTS --prompt='RESOURCE > ')
+RESOURCE=$(echo -e "POD\nDEPLOYMENT\nREPLICASET\nSTATEFULSET\nDAEMONSET\nJOB\nCRONJOB\nHORIZONTALPODAUTOSCALING\nSERVICE\nINGRESS\nCONFIGMAP\nSECRET\nPERSISTENTVOLUMECLAIM\nPERSISTENTVOLUME\nSERVICEACCOUNT\nROLE\nROLEBINDING\nCLUSTERROLE\nCLUSTERROLEBINDING\nCUSTOMRESOURCEDEFINITION\nNODE\nAPPLY" | fzf $FZF_OPTS --prompt='RESOURCE > ')
 
 case $RESOURCE in
   POD)
@@ -1320,10 +1320,10 @@ case $RESOURCE in
       if [ -z "$NAMESPACE" ]; then
         echo "No namespace selected." && exit 0
       elif [ "$NAMESPACE" = "all-namespaces" ]; then
-        CMD="kubectl get rolebinding -A"
+        CMD="kubectl get rolebinding -A -o wide"
         echo $CMD && eval $CMD
       else
-        CMD="kubectl get rolebinding -n $NAMESPACE"
+        CMD="kubectl get rolebinding -n $NAMESPACE -o wide"
         echo $CMD && eval $CMD
       fi
       ;;
@@ -1446,7 +1446,7 @@ case $RESOURCE in
     ACTION=$(echo -e "GET\nYAML\nDESCRIBE\nEDIT\nDELETE" | fzf $FZF_OPTS --prompt='ACTION > ')
     case $ACTION in
     GET)
-      CMD="kubectl get clusterrolebinding"
+      CMD="kubectl get clusterrolebinding -o wide"
       echo $CMD && eval $CMD
       ;;
     YAML)
@@ -1638,6 +1638,14 @@ case $RESOURCE in
       echo "No action selected." && exit 0
       ;;
     esac
+    ;;
+  APPLY)
+    FILE=$(fzf $FZF_OPTS --prompt='FILE > ')
+    if [ -z "$FILE" ]; then
+      echo "No file selected." && exit 0
+    fi
+    CMD="kubectl apply -f $FILE"
+    echo $CMD && eval $CMD
     ;;
   *)
     echo "No resource selected." && exit 0
