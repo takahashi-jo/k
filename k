@@ -79,7 +79,7 @@ case $RESOURCE in
         CONTAINER=$(echo "$CONTAINER_LIST" | fzf $FZF_OPTS --prompt='CONTAINER > ')
           if [ -n "$CONTAINER" ]; then
           FILTER=$(echo | fzf $FZF_OPTS --prompt='Filter logs (optional): ' --print-query | head -n 1)
-          CMD="kubectl logs -n $NAMESPACE $POD -c $CONTAINER"
+          CMD="kubectl logs -n $NAMESPACE $POD -c $CONTAINER -f"
           if [ -n "$FILTER" ]; then
             CMD="$CMD | grep '$FILTER'"
             echo $CMD && eval $CMD
@@ -1549,7 +1549,7 @@ case $RESOURCE in
     esac
     ;;
   NODE)
-    ACTION=$(echo -e "GET\nYAML\nDESCRIBE\nEDIT\nCORDON\nUNCORDON\nDELETE" | fzf $FZF_OPTS --prompt='ACTION > ')
+    ACTION=$(echo -e "GET\nYAML\nDESCRIBE\nEDIT\nWATCH\nCORDON\nUNCORDON\nDELETE" | fzf $FZF_OPTS --prompt='ACTION > ')
     case $ACTION in
     GET)
       CMD="kubectl get node"
@@ -1569,6 +1569,10 @@ case $RESOURCE in
         echo "No node selected." && exit 0
       fi
       CMD="kubectl describe node $NODE"
+      echo $CMD && eval $CMD
+      ;;
+    WATCH)
+      CMD="watch -n 1 kubectl get node"
       echo $CMD && eval $CMD
       ;;
     EDIT)
