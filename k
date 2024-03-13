@@ -14,10 +14,10 @@ case $RESOURCE in
           echo "No namespace selected." && exit 0
         elif [ "$NAMESPACE" = "all-namespaces" ]; then
           CMD="kubectl get pod -A -o wide"
-          echo $CMD && eval $CMD
+          echo $CMD && eval $CMD && history -s "$CMD"
         else
           CMD="kubectl get pod -n $NAMESPACE -o wide"
-          echo $CMD && eval $CMD
+          echo $CMD && eval $CMD && history -s "$CMD"
         fi
         ;;
       YAML)
@@ -30,7 +30,7 @@ case $RESOURCE in
           echo "No pod selected." && exit 0
         fi
         CMD="kubectl get pod -n $NAMESPACE $POD -o yaml"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
         ;;
       DESCRIBE)
         NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -42,7 +42,7 @@ case $RESOURCE in
           echo "No pod selected." && exit 0
         fi
         CMD="kubectl describe pod -n $NAMESPACE $POD"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
         ;;
       WATCH)
         NAMESPACE=$( (echo "all-namespaces" && kubectl get ns --no-headers | awk '{print $1}' | sort) | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -50,10 +50,10 @@ case $RESOURCE in
           echo "No namespace selected." && exit 0
         elif [ "$NAMESPACE" = "all-namespaces" ]; then
           CMD="watch -n 1 kubectl get pod -A -o wide"
-          echo $CMD && eval $CMD
+          echo $CMD && eval $CMD && history -s "$CMD"
         else
           CMD="watch -n 1 kubectl get pod -n $NAMESPACE -o wide"
-          echo $CMD && eval $CMD
+          echo $CMD && eval $CMD && history -s "$CMD"
         fi
         ;;
       LOGS)
@@ -82,9 +82,9 @@ case $RESOURCE in
           CMD="kubectl logs -n $NAMESPACE $POD -c $CONTAINER -f"
           if [ -n "$FILTER" ]; then
             CMD="$CMD | grep '$FILTER'"
-            echo $CMD && eval $CMD
+            echo $CMD && eval $CMD && history -s "$CMD"
           else
-            echo $CMD && eval $CMD
+            echo $CMD && eval $CMD && history -s "$CMD"
           fi
         fi
         ;;
@@ -112,7 +112,7 @@ case $RESOURCE in
         if [ -n "$CONTAINER" ]; then
           CMD_TO_EXEC=$(echo | fzf $FZF_OPTS --prompt='Enter command (e.g., /bin/bash): ' --print-query | head -n 1)
           CMD="kubectl exec -it -n $NAMESPACE $POD -c $CONTAINER -- $CMD_TO_EXEC"
-          echo $CMD && eval $CMD
+          echo $CMD && eval $CMD && history -s "$CMD"
         fi
         ;;
       DELETE)
@@ -130,7 +130,7 @@ case $RESOURCE in
           CONFIRM=$(echo -e "NO\nYES" | fzf $FZF_OPTS --prompt='Are you sure? (y/N) > ')
           if [ "$CONFIRM" = "YES" ]; then
             CMD="kubectl delete pod -n $NAMESPACE $SELECTED_PODS_SPACED --force --grace-period=0"
-            echo $CMD && eval $CMD
+            echo $CMD && eval $CMD && history -s "$CMD"
           else
             echo "Deletion cancelled." && exit 0
           fi
@@ -150,10 +150,10 @@ case $RESOURCE in
         echo "No namespace selected." && exit 0
       elif [ "$NAMESPACE" = "all-namespaces" ]; then
         CMD="kubectl get deployment -A"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
       else
         CMD="kubectl get deployment -n $NAMESPACE"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
       fi
       ;;
     YAML)
@@ -166,7 +166,7 @@ case $RESOURCE in
         echo "No deployment selected." && exit 0
       fi
       CMD="kubectl get deployment -n $NAMESPACE $DEPLOYMENT -o yaml"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     DESCRIBE)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -178,7 +178,7 @@ case $RESOURCE in
         echo "No deployment selected." && exit 0
       fi
       CMD="kubectl describe deployment -n $NAMESPACE $DEPLOYMENT"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     EDIT)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -190,7 +190,7 @@ case $RESOURCE in
         echo "No deployment selected." && exit 0
       fi
       CMD="kubectl edit deployment -n $NAMESPACE $DEPLOYMENT"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     DELETE)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -207,7 +207,7 @@ case $RESOURCE in
         CONFIRM=$(echo -e "NO\nYES" | fzf $FZF_OPTS --prompt='Are you sure? (y/N) > ')
         if [ "$CONFIRM" = "YES" ]; then
           CMD="kubectl delete deployment -n $NAMESPACE $SELECTED_DEPLOYMENTS_SPACED --force --grace-period=0"
-          echo $CMD && eval $CMD
+          echo $CMD && eval $CMD && history -s "$CMD"
         else
           echo "Deletion cancelled." && exit 0
         fi
@@ -227,10 +227,10 @@ case $RESOURCE in
         echo "No namespace selected." && exit 0
       elif [ "$NAMESPACE" = "all-namespaces" ]; then
         CMD="kubectl get replicaset -A"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
       else
         CMD="kubectl get replicaset -n $NAMESPACE"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
       fi
       ;;
     YAML)
@@ -243,7 +243,7 @@ case $RESOURCE in
         echo "No replicaset selected." && exit 0
       fi
       CMD="kubectl get replicaset -n $NAMESPACE $REPLICASET -o yaml"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     DESCRIBE)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -255,7 +255,7 @@ case $RESOURCE in
         echo "No replicaset selected." && exit 0
       fi
       CMD="kubectl describe replicaset -n $NAMESPACE $REPLICASET"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     EDIT)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -267,7 +267,7 @@ case $RESOURCE in
         echo "No replicaset selected." && exit 0
       fi
       CMD="kubectl edit replicaset -n $NAMESPACE $REPLICASET"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     DELETE)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -284,7 +284,7 @@ case $RESOURCE in
         CONFIRM=$(echo -e "NO\nYES" | fzf $FZF_OPTS --prompt='Are you sure? (y/N) > ')
         if [ "$CONFIRM" = "YES" ]; then
           CMD="kubectl delete replicaset -n $NAMESPACE $SELECTED_REPLICASETS_SPACED --force --grace-period=0"
-          echo $CMD && eval $CMD
+          echo $CMD && eval $CMD && history -s "$CMD"
         else
           echo "Deletion cancelled." && exit 0
         fi
@@ -304,10 +304,10 @@ case $RESOURCE in
         echo "No namespace selected." && exit 0
       elif [ "$NAMESPACE" = "all-namespaces" ]; then
         CMD="kubectl get statefulset -A"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
       else
         CMD="kubectl get statefulset -n $NAMESPACE"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
       fi
       ;;
     YAML)
@@ -320,7 +320,7 @@ case $RESOURCE in
         echo "No statefulset selected." && exit 0
       fi
       CMD="kubectl get statefulset -n $NAMESPACE $STATEFULSET -o yaml"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     DESCRIBE)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -332,7 +332,7 @@ case $RESOURCE in
         echo "No statefulset selected." && exit 0
       fi
       CMD="kubectl describe statefulset -n $NAMESPACE $STATEFULSET"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     EDIT)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -344,7 +344,7 @@ case $RESOURCE in
         echo "No statefulset selected." && exit 0
       fi
       CMD="kubectl edit statefulset -n $NAMESPACE $STATEFULSET"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     DELETE)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -361,7 +361,7 @@ case $RESOURCE in
         CONFIRM=$(echo -e "NO\nYES" | fzf $FZF_OPTS --prompt='Are you sure? (y/N) > ')
         if [ "$CONFIRM" = "YES" ]; then
           CMD="kubectl delete statefulset -n $NAMESPACE $SELECTED_STATEFULSETS_SPACED --force --grace-period=0"
-          echo $CMD && eval $CMD
+          echo $CMD && eval $CMD && history -s "$CMD"
         else
           echo "Deletion cancelled." && exit 0
         fi
@@ -381,10 +381,10 @@ case $RESOURCE in
         echo "No namespace selected." && exit 0
       elif [ "$NAMESPACE" = "all-namespaces" ]; then
         CMD="kubectl get daemonset -A"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
       else
         CMD="kubectl get daemonset -n $NAMESPACE"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
       fi
       ;;
     YAML)
@@ -397,7 +397,7 @@ case $RESOURCE in
         echo "No daemonset selected." && exit 0
       fi
       CMD="kubectl get daemonset -n $NAMESPACE $DAEMONSET -o yaml"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     DESCRIBE)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -409,7 +409,7 @@ case $RESOURCE in
         echo "No daemonset selected." && exit 0
       fi
       CMD="kubectl describe daemonset -n $NAMESPACE $DAEMONSET"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     EDIT)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -421,7 +421,7 @@ case $RESOURCE in
         echo "No daemonset selected." && exit 0
       fi
       CMD="kubectl edit daemonset -n $NAMESPACE $DAEMONSET"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     DELETE)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -438,7 +438,7 @@ case $RESOURCE in
         CONFIRM=$(echo -e "NO\nYES" | fzf $FZF_OPTS --prompt='Are you sure? (y/N) > ')
         if [ "$CONFIRM" = "YES" ]; then
           CMD="kubectl delete daemonset -n $NAMESPACE $SELECTED_DAEMONSETS_SPACED --force --grace-period=0"
-          echo $CMD && eval $CMD
+          echo $CMD && eval $CMD && history -s "$CMD"
         else
           echo "Deletion cancelled." && exit 0
         fi
@@ -458,10 +458,10 @@ case $RESOURCE in
         echo "No namespace selected." && exit 0
       elif [ "$NAMESPACE" = "all-namespaces" ]; then
         CMD="kubectl get job -A"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
       else
         CMD="kubectl get job -n $NAMESPACE"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
       fi
       ;;
     YAML)
@@ -474,7 +474,7 @@ case $RESOURCE in
         echo "No job selected." && exit 0
       fi
       CMD="kubectl get job -n $NAMESPACE $JOB -o yaml"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     DESCRIBE)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -486,7 +486,7 @@ case $RESOURCE in
         echo "No job selected." && exit 0
       fi
       CMD="kubectl describe job -n $NAMESPACE $JOB"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     EDIT)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -498,7 +498,7 @@ case $RESOURCE in
         echo "No job selected." && exit 0
       fi
       CMD="kubectl edit job -n $NAMESPACE $JOB"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     DELETE)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -515,7 +515,7 @@ case $RESOURCE in
         CONFIRM=$(echo -e "NO\nYES" | fzf $FZF_OPTS --prompt='Are you sure? (y/N) > ')
         if [ "$CONFIRM" = "YES" ]; then
           CMD="kubectl delete job -n $NAMESPACE $SELECTED_JOBS_SPACED --force --grace-period=0"
-          echo $CMD && eval $CMD
+          echo $CMD && eval $CMD && history -s "$CMD"
         else
           echo "Deletion cancelled." && exit 0
         fi
@@ -535,10 +535,10 @@ case $RESOURCE in
         echo "No namespace selected." && exit 0
       elif [ "$NAMESPACE" = "all-namespaces" ]; then
         CMD="kubectl get cronjob -A"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
       else
         CMD="kubectl get cronjob -n $NAMESPACE"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
       fi
       ;;
     YAML)
@@ -551,7 +551,7 @@ case $RESOURCE in
         echo "No cronjob selected." && exit 0
       fi
       CMD="kubectl get cronjob -n $NAMESPACE $CRONJOB -o yaml"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     DESCRIBE)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -563,7 +563,7 @@ case $RESOURCE in
         echo "No cronjob selected." && exit 0
       fi
       CMD="kubectl describe cronjob -n $NAMESPACE $CRONJOB"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     EDIT)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -575,7 +575,7 @@ case $RESOURCE in
         echo "No cronjob selected." && exit 0
       fi
       CMD="kubectl edit cronjob -n $NAMESPACE $CRONJOB"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     DELETE)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -592,7 +592,7 @@ case $RESOURCE in
         CONFIRM=$(echo -e "NO\nYES" | fzf $FZF_OPTS --prompt='Are you sure? (y/N) > ')
         if [ "$CONFIRM" = "YES" ]; then
           CMD="kubectl delete cronjob -n $NAMESPACE $SELECTED_CRONJOBS_SPACED --force --grace-period=0"
-          echo $CMD && eval $CMD
+          echo $CMD && eval $CMD && history -s "$CMD"
         else
           echo "Deletion cancelled." && exit 0
         fi
@@ -612,10 +612,10 @@ case $RESOURCE in
         echo "No namespace selected." && exit 0
       elif [ "$NAMESPACE" = "all-namespaces" ]; then
         CMD="kubectl get horizontalpodautoscaling -A"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
       else
         CMD="kubectl get horizontalpodautoscaling -n $NAMESPACE"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
       fi
       ;;
     YAML)
@@ -628,7 +628,7 @@ case $RESOURCE in
         echo "No horizontalpodautoscaling selected." && exit 0
       fi
       CMD="kubectl get horizontalpodautoscaling -n $NAMESPACE $HORIZONTALPODAUTOSCALING -o yaml"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     DESCRIBE)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -640,7 +640,7 @@ case $RESOURCE in
         echo "No horizontalpodautoscaling selected." && exit 0
       fi
       CMD="kubectl describe horizontalpodautoscaling -n $NAMESPACE $HORIZONTALPODAUTOSCALING"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     EDIT)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -652,7 +652,7 @@ case $RESOURCE in
         echo "No horizontalpodautoscaling selected." && exit 0
       fi
       CMD="kubectl edit horizontalpodautoscaling -n $NAMESPACE $HORIZONTALPODAUTOSCALING"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     DELETE)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -669,7 +669,7 @@ case $RESOURCE in
         CONFIRM=$(echo -e "NO\nYES" | fzf $FZF_OPTS --prompt='Are you sure? (y/N) > ')
         if [ "$CONFIRM" = "YES" ]; then
           CMD="kubectl delete horizontalpodautoscaling -n $NAMESPACE $SELECTED_HORIZONTALPODAUTOSCALINGS_SPACED --force --grace-period=0"
-          echo $CMD && eval $CMD
+          echo $CMD && eval $CMD && history -s "$CMD"
         else
           echo "Deletion cancelled." && exit 0
         fi
@@ -689,10 +689,10 @@ case $RESOURCE in
           echo "No namespace selected." && exit 0
         elif [ "$NAMESPACE" = "all-namespaces" ]; then
           CMD="kubectl get service -A"
-          echo $CMD && eval $CMD
+          echo $CMD && eval $CMD && history -s "$CMD"
         else
           CMD="kubectl get service -n $NAMESPACE"
-          echo $CMD && eval $CMD
+          echo $CMD && eval $CMD && history -s "$CMD"
         fi
         ;;
       YAML)
@@ -705,7 +705,7 @@ case $RESOURCE in
           echo "No service selected." && exit 0
         fi
         CMD="kubectl get service -n $NAMESPACE $SERVICE -o yaml"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
         ;;
       DESCRIBE)
         NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -717,7 +717,7 @@ case $RESOURCE in
           echo "No service selected." && exit 0
         fi
         CMD="kubectl describe service -n $NAMESPACE $SERVICE"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
         ;;
       PORT_FORWARD)
         NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -733,7 +733,7 @@ case $RESOURCE in
             echo "Port not specified." && exit 0
         fi
         CMD="kubectl port-forward -n $NAMESPACE service/$SERVICE $PORT"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
         ;;
       EDIT)
         NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -745,7 +745,7 @@ case $RESOURCE in
           echo "No service selected." && exit 0
         fi
         CMD="kubectl edit service -n $NAMESPACE $SERVICE"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
         ;;
       DELETE)
         NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -762,7 +762,7 @@ case $RESOURCE in
           CONFIRM=$(echo -e "NO\nYES" | fzf $FZF_OPTS --prompt='Are you sure? (y/N) > ')
           if [ "$CONFIRM" = "YES" ]; then
             CMD="kubectl delete service -n $NAMESPACE $SELECTED_SERVICES_SPACED --force --grace-period=0"
-            echo $CMD && eval $CMD
+            echo $CMD && eval $CMD && history -s "$CMD"
           else
             echo "Deletion cancelled." && exit 0
           fi
@@ -782,10 +782,10 @@ case $RESOURCE in
           echo "No namespace selected." && exit 0
         elif [ "$NAMESPACE" = "all-namespaces" ]; then
           CMD="kubectl get ingress -A"
-          echo $CMD && eval $CMD
+          echo $CMD && eval $CMD && history -s "$CMD"
         else
           CMD="kubectl get ingress -n $NAMESPACE"
-          echo $CMD && eval $CMD
+          echo $CMD && eval $CMD && history -s "$CMD"
         fi
         ;;
       YAML)
@@ -798,7 +798,7 @@ case $RESOURCE in
           echo "No ingress selected." && exit 0
         fi
         CMD="kubectl get ingress -n $NAMESPACE $INGRESS -o yaml"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
         ;;
       DESCRIBE)
         NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -810,7 +810,7 @@ case $RESOURCE in
           echo "No ingress selected." && exit 0
         fi
         CMD="kubectl describe ingress -n $NAMESPACE $INGRESS"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
         ;;
       EDIT)
         NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -822,7 +822,7 @@ case $RESOURCE in
           echo "No ingress selected." && exit 0
         fi
         CMD="kubectl edit ingress -n $NAMESPACE $INGRESS"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
         ;;
       DELETE)
         NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -839,7 +839,7 @@ case $RESOURCE in
           CONFIRM=$(echo -e "NO\nYES" | fzf $FZF_OPTS --prompt='Are you sure? (y/N) > ')
           if [ "$CONFIRM" = "YES" ]; then
             CMD="kubectl delete ingress -n $NAMESPACE $SELECTED_INGRESSES_SPACED --force --grace-period=0"
-            echo $CMD && eval $CMD
+            echo $CMD && eval $CMD && history -s "$CMD"
           else
             echo "Deletion cancelled." && exit 0
           fi
@@ -859,10 +859,10 @@ case $RESOURCE in
           echo "No namespace selected." && exit 0
         elif [ "$NAMESPACE" = "all-namespaces" ]; then
           CMD="kubectl get configmap -A"
-          echo $CMD && eval $CMD
+          echo $CMD && eval $CMD && history -s "$CMD"
         else
           CMD="kubectl get configmap -n $NAMESPACE"
-          echo $CMD && eval $CMD
+          echo $CMD && eval $CMD && history -s "$CMD"
         fi
         ;;
       YAML)
@@ -875,7 +875,7 @@ case $RESOURCE in
           echo "No configmap selected." && exit 0
         fi
         CMD="kubectl get configmap -n $NAMESPACE $CONFIGMAP -o yaml"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
         ;;
       DESCRIBE)
         NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -887,7 +887,7 @@ case $RESOURCE in
           echo "No configmap selected." && exit 0
         fi
         CMD="kubectl describe configmap -n $NAMESPACE $CONFIGMAP"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
         ;;
       EDIT)
         NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -899,7 +899,7 @@ case $RESOURCE in
           echo "No configmap selected." && exit 0
         fi
         CMD="kubectl edit configmap -n $NAMESPACE $CONFIGMAP"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
         ;;
       DELETE)
         NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -916,7 +916,7 @@ case $RESOURCE in
           CONFIRM=$(echo -e "NO\nYES" | fzf $FZF_OPTS --prompt='Are you sure? (y/N) > ')
           if [ "$CONFIRM" = "YES" ]; then
             CMD="kubectl delete configmap -n $NAMESPACE $SELECTED_CONFIGMAPS_SPACED --force --grace-period=0"
-            echo $CMD && eval $CMD
+            echo $CMD && eval $CMD && history -s "$CMD"
           else
             echo "Deletion cancelled." && exit 0
           fi
@@ -936,10 +936,10 @@ case $RESOURCE in
         echo "No namespace selected." && exit 0
       elif [ "$NAMESPACE" = "all-namespaces" ]; then
         CMD="kubectl get secret -A"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
       else
         CMD="kubectl get secret -n $NAMESPACE"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
       fi
       ;;
     YAML)
@@ -952,7 +952,7 @@ case $RESOURCE in
         echo "No secret selected." && exit 0
       fi
       CMD="kubectl get secret -n $NAMESPACE $SECRET -o yaml"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     DESCRIBE)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -964,7 +964,7 @@ case $RESOURCE in
         echo "No secret selected." && exit 0
       fi
       CMD="kubectl describe secret -n $NAMESPACE $SECRET"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     EDIT)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -976,7 +976,7 @@ case $RESOURCE in
         echo "No secret selected." && exit 0
       fi
       CMD="kubectl edit secret -n $NAMESPACE $SECRET"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     DELETE)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -993,7 +993,7 @@ case $RESOURCE in
         CONFIRM=$(echo -e "NO\nYES" | fzf $FZF_OPTS --prompt='Are you sure? (y/N) > ')
         if [ "$CONFIRM" = "YES" ]; then
           CMD="kubectl delete secret -n $NAMESPACE $SELECTED_SECRETS_SPACED --force --grace-period=0"
-          echo $CMD && eval $CMD
+          echo $CMD && eval $CMD && history -s "$CMD"
         else
           echo "Deletion cancelled." && exit 0
         fi
@@ -1013,10 +1013,10 @@ case $RESOURCE in
         echo "No namespace selected." && exit 0
       elif [ "$NAMESPACE" = "all-namespaces" ]; then
         CMD="kubectl get persistentvolumeclaim -A"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
       else
         CMD="kubectl get persistentvolumeclaim -n $NAMESPACE"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
       fi
       ;;
     YAML)
@@ -1029,7 +1029,7 @@ case $RESOURCE in
         echo "No persistentvolumeclaim selected." && exit 0
       fi
       CMD="kubectl get persistentvolumeclaim -n $NAMESPACE $PERSISTENTVOLUMECLAIM -o yaml"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     DESCRIBE)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -1041,7 +1041,7 @@ case $RESOURCE in
         echo "No persistentvolumeclaim selected." && exit 0
       fi
       CMD="kubectl describe persistentvolumeclaim -n $NAMESPACE $PERSISTENTVOLUMECLAIM"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     EDIT)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -1053,7 +1053,7 @@ case $RESOURCE in
         echo "No persistentvolumeclaim selected." && exit 0
       fi
       CMD="kubectl edit persistentvolumeclaim -n $NAMESPACE $PERSISTENTVOLUMECLAIM"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     DELETE)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -1070,7 +1070,7 @@ case $RESOURCE in
         CONFIRM=$(echo -e "NO\nYES" | fzf $FZF_OPTS --prompt='Are you sure? (y/N) > ')
         if [ "$CONFIRM" = "YES" ]; then
           CMD="kubectl delete persistentvolumeclaim -n $NAMESPACE $SELECTED_PERSISTENTVOLUMECLAIMS_SPACED --force --grace-period=0"
-          echo $CMD && eval $CMD
+          echo $CMD && eval $CMD && history -s "$CMD"
         else
           echo "Deletion cancelled." && exit 0
         fi
@@ -1090,10 +1090,10 @@ case $RESOURCE in
         echo "No namespace selected." && exit 0
       elif [ "$NAMESPACE" = "all-namespaces" ]; then
         CMD="kubectl get persistentvolume -A"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
       else
         CMD="kubectl get persistentvolume -n $NAMESPACE"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
       fi
       ;;
     YAML)
@@ -1106,7 +1106,7 @@ case $RESOURCE in
         echo "No persistentvolume selected." && exit 0
       fi
       CMD="kubectl get persistentvolume -n $NAMESPACE $PERSISTENTVOLUME -o yaml"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     DESCRIBE)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -1118,7 +1118,7 @@ case $RESOURCE in
         echo "No persistentvolume selected." && exit 0
       fi
       CMD="kubectl describe persistentvolume -n $NAMESPACE $PERSISTENTVOLUME"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     EDIT)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -1130,7 +1130,7 @@ case $RESOURCE in
         echo "No persistentvolume selected." && exit 0
       fi
       CMD="kubectl edit persistentvolume -n $NAMESPACE $PERSISTENTVOLUME"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     DELETE)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -1147,7 +1147,7 @@ case $RESOURCE in
         CONFIRM=$(echo -e "NO\nYES" | fzf $FZF_OPTS --prompt='Are you sure? (y/N) > ')
         if [ "$CONFIRM" = "YES" ]; then
           CMD="kubectl delete persistentvolume -n $NAMESPACE $SELECTED_PERSISTENTVOLUMES_SPACED --force --grace-period=0"
-          echo $CMD && eval $CMD
+          echo $CMD && eval $CMD && history -s "$CMD"
         else
           echo "Deletion cancelled." && exit 0
         fi
@@ -1167,10 +1167,10 @@ case $RESOURCE in
         echo "No namespace selected." && exit 0
       elif [ "$NAMESPACE" = "all-namespaces" ]; then
         CMD="kubectl get serviceaccount -A"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
       else
         CMD="kubectl get serviceaccount -n $NAMESPACE"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
       fi
       ;;
     YAML)
@@ -1183,7 +1183,7 @@ case $RESOURCE in
         echo "No serviceaccount selected." && exit 0
       fi
       CMD="kubectl get serviceaccount -n $NAMESPACE $SERVICEACCOUNT -o yaml"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     DESCRIBE)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -1195,7 +1195,7 @@ case $RESOURCE in
         echo "No serviceaccount selected." && exit 0
       fi
       CMD="kubectl describe serviceaccount -n $NAMESPACE $SERVICEACCOUNT"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     EDIT)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -1207,7 +1207,7 @@ case $RESOURCE in
         echo "No serviceaccount selected." && exit 0
       fi
       CMD="kubectl edit serviceaccount -n $NAMESPACE $SERVICEACCOUNT"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     DELETE)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -1224,7 +1224,7 @@ case $RESOURCE in
         CONFIRM=$(echo -e "NO\nYES" | fzf $FZF_OPTS --prompt='Are you sure? (y/N) > ')
         if [ "$CONFIRM" = "YES" ]; then
           CMD="kubectl delete serviceaccount -n $NAMESPACE $SELECTED_SERVICEACCOUNTS_SPACED --force --grace-period=0"
-          echo $CMD && eval $CMD
+          echo $CMD && eval $CMD && history -s "$CMD"
         else
           echo "Deletion cancelled." && exit 0
         fi
@@ -1244,10 +1244,10 @@ case $RESOURCE in
         echo "No namespace selected." && exit 0
       elif [ "$NAMESPACE" = "all-namespaces" ]; then
         CMD="kubectl get role -A"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
       else
         CMD="kubectl get role -n $NAMESPACE"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
       fi
       ;;
     YAML)
@@ -1260,7 +1260,7 @@ case $RESOURCE in
         echo "No role selected." && exit 0
       fi
       CMD="kubectl get role -n $NAMESPACE $ROLE -o yaml"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     DESCRIBE)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -1272,7 +1272,7 @@ case $RESOURCE in
         echo "No role selected." && exit 0
       fi
       CMD="kubectl describe role -n $NAMESPACE $ROLE"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     EDIT)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -1284,7 +1284,7 @@ case $RESOURCE in
         echo "No role selected." && exit 0
       fi
       CMD="kubectl edit role -n $NAMESPACE $ROLE"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     DELETE)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -1301,7 +1301,7 @@ case $RESOURCE in
         CONFIRM=$(echo -e "NO\nYES" | fzf $FZF_OPTS --prompt='Are you sure? (y/N) > ')
         if [ "$CONFIRM" = "YES" ]; then
           CMD="kubectl delete role -n $NAMESPACE $SELECTED_ROLES_SPACED --force --grace-period=0"
-          echo $CMD && eval $CMD
+          echo $CMD && eval $CMD && history -s "$CMD"
         else
           echo "Deletion cancelled." && exit 0
         fi
@@ -1321,10 +1321,10 @@ case $RESOURCE in
         echo "No namespace selected." && exit 0
       elif [ "$NAMESPACE" = "all-namespaces" ]; then
         CMD="kubectl get rolebinding -A -o wide"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
       else
         CMD="kubectl get rolebinding -n $NAMESPACE -o wide"
-        echo $CMD && eval $CMD
+        echo $CMD && eval $CMD && history -s "$CMD"
       fi
       ;;
     YAML)
@@ -1337,7 +1337,7 @@ case $RESOURCE in
         echo "No rolebinding selected." && exit 0
       fi
       CMD="kubectl get rolebinding -n $NAMESPACE $ROLEBINDING -o yaml"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     DESCRIBE)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -1349,7 +1349,7 @@ case $RESOURCE in
         echo "No rolebinding selected." && exit 0
       fi
       CMD="kubectl describe rolebinding -n $NAMESPACE $ROLEBINDING"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     EDIT)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -1361,7 +1361,7 @@ case $RESOURCE in
         echo "No rolebinding selected." && exit 0
       fi
       CMD="kubectl edit rolebinding -n $NAMESPACE $ROLEBINDING"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     DELETE)
       NAMESPACE=$(kubectl get ns --no-headers | awk '{print $1}' | sort | fzf $FZF_OPTS --prompt='NAMESPACE > ')
@@ -1378,7 +1378,7 @@ case $RESOURCE in
         CONFIRM=$(echo -e "NO\nYES" | fzf $FZF_OPTS --prompt='Are you sure? (y/N) > ')
         if [ "$CONFIRM" = "YES" ]; then
           CMD="kubectl delete rolebinding -n $NAMESPACE $SELECTED_ROLEBINDINGS_SPACED --force --grace-period=0"
-          echo $CMD && eval $CMD
+          echo $CMD && eval $CMD && history -s "$CMD"
         else
           echo "Deletion cancelled." && exit 0
         fi
@@ -1394,7 +1394,7 @@ case $RESOURCE in
     case $ACTION in
     GET)
       CMD="kubectl get clusterrole"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     YAML)
       CLUSTERROLE=$(kubectl get clusterrole --no-headers | fzf $FZF_OPTS --prompt='CLUSTERROLE > ' | awk '{print $1}')
@@ -1402,7 +1402,7 @@ case $RESOURCE in
         echo "No clusterrole selected." && exit 0
       fi
       CMD="kubectl get clusterrole $CLUSTERROLE -o yaml"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     DESCRIBE)
       CLUSTERROLE=$(kubectl get clusterrole --no-headers | fzf $FZF_OPTS --prompt='CLUSTERROLE > ' | awk '{print $1}')
@@ -1410,7 +1410,7 @@ case $RESOURCE in
         echo "No clusterrole selected." && exit 0
       fi
       CMD="kubectl describe clusterrole $CLUSTERROLE"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     EDIT)
       CLUSTERROLE=$(kubectl get clusterrole --no-headers | fzf $FZF_OPTS --prompt='CLUSTERROLE > ' | awk '{print $1}')
@@ -1418,7 +1418,7 @@ case $RESOURCE in
         echo "No clusterrole selected." && exit 0
       fi
       CMD="kubectl edit clusterrole $CLUSTERROLE"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     DELETE)
       SELECTED_CLUSTERROLES=$(kubectl get clusterrole --no-headers | fzf $FZF_OPTS --prompt='CLUSTERROLES > ' -m | awk '{print $1}')
@@ -1431,7 +1431,7 @@ case $RESOURCE in
         CONFIRM=$(echo -e "NO\nYES" | fzf $FZF_OPTS --prompt='Are you sure? (y/N) > ')
         if [ "$CONFIRM" = "YES" ]; then
           CMD="kubectl delete clusterrole $SELECTED_CLUSTERROLES_SPACED --force --grace-period=0"
-          echo $CMD && eval $CMD
+          echo $CMD && eval $CMD && history -s "$CMD"
         else
           echo "Deletion cancelled." && exit 0
         fi
@@ -1447,7 +1447,7 @@ case $RESOURCE in
     case $ACTION in
     GET)
       CMD="kubectl get clusterrolebinding -o wide"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     YAML)
       CLUSTERROLEBINDING=$(kubectl get clusterrolebinding --no-headers | fzf $FZF_OPTS --prompt='CLUSTERROLEBINDING > ' | awk '{print $1}')
@@ -1455,7 +1455,7 @@ case $RESOURCE in
         echo "No clusterrolebinding selected." && exit 0
       fi
       CMD="kubectl get clusterrolebinding $CLUSTERROLEBINDING -o yaml"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     DESCRIBE)
       CLUSTERROLEBINDING=$(kubectl get clusterrolebinding --no-headers | fzf $FZF_OPTS --prompt='CLUSTERROLEBINDING > ' | awk '{print $1}')
@@ -1463,7 +1463,7 @@ case $RESOURCE in
         echo "No clusterrolebinding selected." && exit 0
       fi
       CMD="kubectl describe clusterrolebinding $CLUSTERROLEBINDING"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     EDIT)
       CLUSTERROLEBINDING=$(kubectl get clusterrolebinding --no-headers | fzf $FZF_OPTS --prompt='CLUSTERROLEBINDING > ' | awk '{print $1}')
@@ -1471,7 +1471,7 @@ case $RESOURCE in
         echo "No clusterrolebinding selected." && exit 0
       fi
       CMD="kubectl edit clusterrolebinding $CLUSTERROLEBINDING"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     DELETE)
       SELECTED_CLUSTERROLEBINDINGS=$(kubectl get clusterrolebinding --no-headers | fzf $FZF_OPTS --prompt='CLUSTERROLEBINDINGS > ' -m | awk '{print $1}')
@@ -1484,7 +1484,7 @@ case $RESOURCE in
         CONFIRM=$(echo -e "NO\nYES" | fzf $FZF_OPTS --prompt='Are you sure? (y/N) > ')
         if [ "$CONFIRM" = "YES" ]; then
           CMD="kubectl delete clusterrolebinding $SELECTED_CLUSTERROLEBINDINGS_SPACED --force --grace-period=0"
-          echo $CMD && eval $CMD
+          echo $CMD && eval $CMD && history -s "$CMD"
         else
           echo "Deletion cancelled." && exit 0
         fi
@@ -1500,7 +1500,7 @@ case $RESOURCE in
     case $ACTION in
     GET)
       CMD="kubectl get customresourcedefinition"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     YAML)
       CUSTOMRESOURCEDEFINITION=$(kubectl get customresourcedefinition --no-headers | fzf $FZF_OPTS --prompt='CUSTOMRESOURCEDEFINITION > ' | awk '{print $1}')
@@ -1508,7 +1508,7 @@ case $RESOURCE in
         echo "No customresourcedefinition selected." && exit 0
       fi
       CMD="kubectl get customresourcedefinition $CUSTOMRESOURCEDEFINITION -o yaml"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     DESCRIBE)
       CUSTOMRESOURCEDEFINITION=$(kubectl get customresourcedefinition --no-headers | fzf $FZF_OPTS --prompt='CUSTOMRESOURCEDEFINITION > ' | awk '{print $1}')
@@ -1516,7 +1516,7 @@ case $RESOURCE in
         echo "No customresourcedefinition selected." && exit 0
       fi
       CMD="kubectl describe customresourcedefinition $CUSTOMRESOURCEDEFINITION"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     EDIT)
       CUSTOMRESOURCEDEFINITION=$(kubectl get customresourcedefinition --no-headers | fzf $FZF_OPTS --prompt='CUSTOMRESOURCEDEFINITION > ' | awk '{print $1}')
@@ -1524,7 +1524,7 @@ case $RESOURCE in
         echo "No customresourcedefinition selected." && exit 0
       fi
       CMD="kubectl edit customresourcedefinition $CUSTOMRESOURCEDEFINITION"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     DELETE)
       SELECTED_CUSTOMRESOURCEDEFINITIONS=$(kubectl get customresourcedefinition --no-headers | fzf $FZF_OPTS --prompt='CUSTOMRESOURCEDEFINITIONS > ' -m | awk '{print $1}')
@@ -1537,7 +1537,7 @@ case $RESOURCE in
         CONFIRM=$(echo -e "NO\nYES" | fzf $FZF_OPTS --prompt='Are you sure? (y/N) > ')
         if [ "$CONFIRM" = "YES" ]; then
           CMD="kubectl delete customresourcedefinition $SELECTED_CUSTOMRESOURCEDEFINITIONS_SPACED --force --grace-period=0"
-          echo $CMD && eval $CMD
+          echo $CMD && eval $CMD && history -s "$CMD"
         else
           echo "Deletion cancelled." && exit 0
         fi
@@ -1553,7 +1553,7 @@ case $RESOURCE in
     case $ACTION in
     GET)
       CMD="kubectl get node"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     YAML)
       NODE=$(kubectl get node --no-headers | fzf $FZF_OPTS --prompt='NODE > ' | awk '{print $1}')
@@ -1561,7 +1561,7 @@ case $RESOURCE in
         echo "No node selected." && exit 0
       fi
       CMD="kubectl get node $NODE -o yaml"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     DESCRIBE)
       NODE=$(kubectl get node --no-headers | fzf $FZF_OPTS --prompt='NODE > ' | awk '{print $1}')
@@ -1569,11 +1569,11 @@ case $RESOURCE in
         echo "No node selected." && exit 0
       fi
       CMD="kubectl describe node $NODE"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     WATCH)
       CMD="watch -n 1 kubectl get node"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     EDIT)
       NODE=$(kubectl get node --no-headers | fzf $FZF_OPTS --prompt='NODE > ' | awk '{print $1}')
@@ -1581,7 +1581,7 @@ case $RESOURCE in
         echo "No node selected." && exit 0
       fi
       CMD="kubectl edit node $NODE"
-      echo $CMD && eval $CMD
+      echo $CMD && eval $CMD && history -s "$CMD"
       ;;
     CORDON)
       SELECTED_NODES=$(kubectl get node --no-headers | fzf $FZF_OPTS --prompt='NODES > ' -m | awk '{print $1}')
@@ -1594,7 +1594,7 @@ case $RESOURCE in
         CONFIRM=$(echo -e "NO\nYES" | fzf $FZF_OPTS --prompt='Are you sure? (y/N) > ')
         if [ "$CONFIRM" = "YES" ]; then
           CMD="kubectl cordon $SELECTED_NODES_SPACED"
-          echo $CMD && eval $CMD
+          echo $CMD && eval $CMD && history -s "$CMD"
         else
           echo "Cordon cancelled." && exit 0
         fi
@@ -1611,7 +1611,7 @@ case $RESOURCE in
         CONFIRM=$(echo -e "NO\nYES" | fzf $FZF_OPTS --prompt='Are you sure? (y/N) > ')
         if [ "$CONFIRM" = "YES" ]; then
           CMD="kubectl uncordon $SELECTED_NODES_SPACED"
-          echo $CMD && eval $CMD
+          echo $CMD && eval $CMD && history -s "$CMD"
         else
           echo "Uncordon cancelled." && exit 0
         fi
@@ -1628,7 +1628,7 @@ case $RESOURCE in
         CONFIRM=$(echo -e "NO\nYES" | fzf $FZF_OPTS --prompt='Are you sure? (y/N) > ')
         if [ "$CONFIRM" = "YES" ]; then
           CMD="kubectl delete node $SELECTED_NODES_SPACED --force --grace-period=0"
-          echo $CMD && eval $CMD
+          echo $CMD && eval $CMD && history -s "$CMD"
         else
           echo "Deletion cancelled." && exit 0
         fi
@@ -1645,7 +1645,7 @@ case $RESOURCE in
       echo "No file selected." && exit 0
     fi
     CMD="kubectl apply -f $FILE"
-    echo $CMD && eval $CMD
+    echo $CMD && eval $CMD && history -s "$CMD"
     ;;
   *)
     echo "No resource selected." && exit 0
